@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今日推荐 - {{ date }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        header {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #2c3e50;
+        }
+        .date {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .status {
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .status.empty {
+            color: #7f8c8d;
+        }
+        .status.error {
+            color: #e74c3c;
+        }
+        .recommendation-list {
+            list-style: none;
+        }
+        .recommendation-item {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        .recommendation-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .rank {
+            background: #3498db;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            flex: 1;
+        }
+        .title a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .title a:hover {
+            color: #3498db;
+            text-decoration: underline;
+        }
+        .meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        .content-type {
+            background: #ecf0f1;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #555;
+        }
+        .score {
+            color: #27ae60;
+            font-weight: 500;
+        }
+        .summary {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>今日推荐</h1>
+            <div class="date">{{ date }}</div>
+        </header>
+
+        {% if error %}
+        <div class="status error">
+            <p>{{ error }}</p>
+        </div>
+        {% elif recommendations %}
+        <ul class="recommendation-list">
+            {% for rec in recommendations %}
+            <li class="recommendation-item">
+                <div class="recommendation-header">
+                    <span class="rank">{{ rec.rank }}</span>
+                    <div class="title">
+                        <a href="{{ rec.url }}" target="_blank" rel="noopener">{{ rec.title }}</a>
+                    </div>
+                </div>
+                <div class="meta">
+                    <span class="content-type">{{ rec.content_type }}</span>
+                    <span class="score">评分: {{ "%.3f"|format(rec.score) }}</span>
+                </div>
+                {% if rec.summary %}
+                <div class="summary">{{ rec.summary }}</div>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="status empty">
+            <p>暂无推荐</p>
+            <p style="font-size: 13px; margin-top: 10px;">今日暂无符合条件的推荐内容</p>
+        </div>
+        {% endif %}
+
+        <footer>
+            <p>Information Acquisition Assistant - MVP</p>
+        </footer>
+    </div>
+</body>
+</html>

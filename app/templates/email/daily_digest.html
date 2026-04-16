@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日阅读推荐</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #2c3e50;
+        }
+        .header .date {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .recommendation {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        .recommendation:last-child {
+            border-bottom: none;
+        }
+        .recommendation .rank {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .recommendation .title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 8px 0;
+            display: inline;
+        }
+        .recommendation .title a {
+            color: #2c3e50;
+            text-decoration: none;
+        }
+        .recommendation .title a:hover {
+            color: #3498db;
+        }
+        .recommendation .meta {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin: 8px 0;
+        }
+        .recommendation .meta span {
+            margin-right: 15px;
+        }
+        .recommendation .summary {
+            font-size: 14px;
+            color: #555;
+            margin: 10px 0;
+            line-height: 1.7;
+        }
+        .recommendation .explanation {
+            font-size: 13px;
+            color: #e67e22;
+            margin: 8px 0;
+            font-weight: 500;
+        }
+        .recommendation .score {
+            font-size: 12px;
+            color: #27ae60;
+            margin-top: 8px;
+        }
+        .recommendation .tags {
+            margin-top: 8px;
+        }
+        .recommendation .tag {
+            display: inline-block;
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-right: 5px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+            font-size: 12px;
+            color: #95a5a6;
+        }
+        .footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+        .empty-state h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 每日阅读推荐</h1>
+            <div class="date">{{ date }} · 为您精选 {{ recommendations|length }} 篇内容</div>
+        </div>
+
+        {% if recommendations %}
+            {% for rec in recommendations %}
+            <div class="recommendation">
+                <span class="rank">{{ loop.index }}</span>
+                <h2 class="title"><a href="{{ rec.article.url }}">{{ rec.article.title }}</a></h2>
+
+                {% if rec.explanation %}
+                <div class="explanation">{{ rec.explanation }}</div>
+                {% endif %}
+
+                <div class="meta">
+                    {% if rec.article.source %}
+                    <span>📰 {{ rec.article.source.name }}</span>
+                    {% endif %}
+                    {% if rec.article.author and rec.article.author.name %}
+                    <span>✍️ {{ rec.article.author.name }}</span>
+                    {% endif %}
+                    {% if rec.article.reading_time_minutes %}
+                    <span>⏱️ {{ rec.article.reading_time_minutes }} 分钟</span>
+                    {% endif %}
+                </div>
+
+                {% if rec.article.summary %}
+                <div class="summary">{{ rec.article.summary[:200] }}{% if rec.article.summary|length > 200 %}...{% endif %}</div>
+                {% endif %}
+
+                <div class="score">⭐ 推荐度: {{ "%.0f"|format(rec.score * 100) }}%</div>
+
+                {% if rec.article.classification_tags %}
+                <div class="tags">
+                    {% for tag in rec.article.classification_tags[:3] %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <h2>今日暂无推荐</h2>
+                <p>系统正在为您筛选高质量内容，请稍后再查看。</p>
+            </div>
+        {% endif %}
+
+        <div class="footer">
+            <p>由 信息获取助手 生成 · <a href="{{ dashboard_url }}">查看完整推荐</a></p>
+            <p style="margin-top: 10px; font-size: 11px;">如果您不想收到此邮件，请修改配置或联系管理员</p>
+        </div>
+    </div>
+</body>
+</html>

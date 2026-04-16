@@ -1,0 +1,35 @@
+每日阅读推荐 - {{ date }}
+为您精选 {{ recommendations|length }} 篇内容
+================================================================
+
+{% if recommendations %}
+{% for rec in recommendations %}
+{{ loop.index }}. {{ rec.article.title }}
+{% if rec.explanation %}💡 {{ rec.explanation }}{% endif %}
+链接: {{ rec.article.url }}
+{% if rec.article.source %}来源: {{ rec.article.source.name }}{% endif %}
+{% if rec.article.author and rec.article.author.name %}作者: {{ rec.article.author.name }}{% endif %}
+{% if rec.article.reading_time_minutes %}预计阅读: {{ rec.article.reading_time_minutes }} 分钟{% endif %}
+推荐度: {{ "%.0f"|format(rec.score * 100) }}%
+
+{% if rec.article.summary %}
+摘要: {{ rec.article.summary[:150] }}{% if rec.article.summary|length > 150 %}...{% endif %}
+{% endif %}
+
+{% if rec.article.classification_tags %}
+标签: {{ rec.article.classification_tags[:3]|join(', ') }}
+{% endif %}
+
+---
+
+{% endfor %}
+{% else %}
+今日暂无推荐
+系统正在为您筛选高质量内容，请稍后再查看。
+{% endif %}
+
+================================================================
+由 信息获取助手 生成
+查看完整推荐: {{ dashboard_url }}
+
+如果您不想收到此邮件，请修改配置或联系管理员

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今日推荐 - {{ date }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        .date {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .recommendation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .recommendation-item {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .recommendation-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .item-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .rank {
+            background: #3498db;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .content-type {
+            background: #ecf0f1;
+            color: #7f8c8d;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .score {
+            margin-left: auto;
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .title a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .title a:hover {
+            color: #3498db;
+            text-decoration: underline;
+        }
+        .summary {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #95a5a6;
+        }
+        .source {
+            font-style: italic;
+        }
+        .read-more {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .read-more:hover {
+            text-decoration: underline;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .empty-state h2 {
+            color: #7f8c8d;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .empty-state p {
+            color: #95a5a6;
+            font-size: 14px;
+        }
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fdf2f2;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
+        }
+        .error-state h2 {
+            color: #dc2626;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .error-state p {
+            color: #7f1d1d;
+            font-size: 14px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #95a5a6;
+            font-size: 12px;
+        }
+        .feedback-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #ecf0f1;
+        }
+        .feedback-btn {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .feedback-btn:hover {
+            background: #e9ecef;
+            transform: scale(1.05);
+        }
+        .feedback-btn:active {
+            transform: scale(0.95);
+        }
+        .feedback-btn.like:hover {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .feedback-btn.dislike:hover {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .feedback-btn.skip:hover {
+            background: #fff3cd;
+            border-color: #ffeeba;
+        }
+        .feedback-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .feedback-msg {
+            font-size: 12px;
+            color: #27ae60;
+            margin-left: auto;
+        }
+        .feedback-msg.error {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>今日推荐</h1>
+            <div class="date">{{ date }}</div>
+        </header>
+
+        {% if error %}
+        <div class="error-state">
+            <h2>获取失败</h2>
+            <p>无法加载推荐内容，请稍后重试</p>
+        </div>
+        {% elif recommendations %}
+        <div class="recommendation-list">
+            {% for item in recommendations %}
+            <article class="recommendation-item">
+                <div class="item-header">
+                    <span class="rank">{{ item.rank }}</span>
+                    <span class="content-type">{{ item.content_type }}</span>
+                    <span class="score">{{ "%.2f"|format(item.score) }}</span>
+                </div>
+                <h2 class="title">
+                    <a href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title }}</a>
+                </h2>
+                {% if item.summary %}
+                <p class="summary">{{ item.summary }}</p>
+                {% endif %}
+                <div class="meta">
+                    <span class="source">来源: {{ item.source_name }}</span>
+                    <a href="{{ item.url }}" class="read-more" target="_blank" rel="noopener" data-id="{{ item.id }}">阅读原文 →</a>
+                </div>
+                <div class="feedback-buttons" data-rec-id="{{ item.id }}">
+                    <button class="feedback-btn like" onclick="submitFeedback('{{ item.id }}', 'like')" title="有用">👍</button>
+                    <button class="feedback-btn dislike" onclick="submitFeedback('{{ item.id }}', 'dislike')" title="没用">👎</button>
+                    <button class="feedback-btn skip" onclick="submitFeedback('{{ item.id }}', 'skip')" title="跳过">⏭️</button>
+                    <span class="feedback-msg" id="msg-{{ item.id }}"></span>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h2>暂无推荐</h2>
+            <p>今天还没有生成推荐内容，请稍后再来</p>
+        </div>
+        {% endif %}
+
+        <footer>
+            <p>Information Acquisition Assistant</p>
+        </footer>
+    </div>
+
+    <script>
+        // Track click and open article
+        document.querySelectorAll('.read-more').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const recId = this.dataset.id;
+                const url = this.href;
+
+                // Record click
+                fetch(`/api/recommendations/${recId}/click`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ source: 'homepage' })
+                }).then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Click tracking failed');
+                }).then(data => {
+                    // Open article in new tab
+                    window.open(url, '_blank');
+                }).catch(err => {
+                    console.error('Failed to record click:', err);
+                    // Still open the article even if tracking fails
+                    window.open(url, '_blank');
+                });
+            });
+        });
+
+        // Submit feedback (like/dislike/skip)
+        function submitFeedback(recId, action) {
+            const msgEl = document.getElementById(`msg-${recId}`);
+            const buttons = document.querySelectorAll(`.feedback-buttons[data-rec-id="${recId}"] .feedback-btn`);
+
+            // Disable buttons temporarily
+            buttons.forEach(btn => btn.classList.add('disabled'));
+
+            fetch(`/api/recommendations/${recId}/feedback`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: action })
+            }).then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Feedback submission failed');
+            }).then(data => {
+                // Show success message
+                const actionText = { like: '已标记为有用', dislike: '已记录', skip: '已跳过' };
+                msgEl.textContent = actionText[action] || '已记录';
+                msgEl.className = 'feedback-msg';
+
+                // Re-enable buttons after delay
+                setTimeout(() => {
+                    buttons.forEach(btn => btn.classList.remove('disabled'));
+                }, 1000);
+            }).catch(err => {
+                console.error('Failed to submit feedback:', err);
+                msgEl.textContent = '记录失败，请重试';
+                msgEl.className = 'feedback-msg error';
+
+                // Re-enable buttons
+                buttons.forEach(btn => btn.classList.remove('disabled'));
+            });
+        }
+    </script>
+</body>
+</html>
